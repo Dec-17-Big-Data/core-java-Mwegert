@@ -1,8 +1,15 @@
 package com.revature.eval.java.core;
 
+import java.io.IOException;
 import java.time.temporal.Temporal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.*;
 
 public class EvaluationService {
 
@@ -30,10 +37,65 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String acronym(String phrase) {
-		// TODO Write an implementation for this method declaration
-		return null;
-	}
+		//		StringBuilder myString = new StringBuilder(phrase);
+		//		myString.
+		ArrayList<Integer> firstLetters = new ArrayList<>();
+		StringBuilder abbr = new StringBuilder("");
+		int startPoint = 0;
+		int spaceIndex;
+		int hyphenIndex;
+		
+		int counter = 0;
+		while(phrase.charAt(counter) + "" == " ") {
+			++counter;
+			++startPoint;
+		}
+		
+		firstLetters.add(counter);
+		
+		spaceIndex = phrase.indexOf(" ", startPoint);
+		hyphenIndex = phrase.indexOf("-",startPoint);
+		while (spaceIndex != -1 || hyphenIndex != -1){ // if hyphen or space in string
+			while(!Character.isLetter(phrase.charAt(startPoint+1))) { ++startPoint;} // next char must be letter
+			
+			if (hyphenIndex != -1 && spaceIndex != -1) {// if there's a hyphen AND space
+				firstLetters.add(Math.min(hyphenIndex, spaceIndex) + 1);
+				startPoint = Math.min(hyphenIndex, spaceIndex) + 1;
+			}
+			else {
+				firstLetters.add(spaceIndex + 1);
+				startPoint = spaceIndex + 1;
+			}
 
+			hyphenIndex = phrase.indexOf("-",startPoint);
+			spaceIndex = phrase.indexOf(" ", startPoint);
+		}
+
+		for(int j = 0; j < firstLetters.size(); j++) {
+			abbr.append(Character.toUpperCase((phrase.charAt(firstLetters.get(j)))));
+		}
+		return abbr.toString();
+	}
+	
+//	public String acronym(String phrase) {
+//		ArrayList<Integer> firstLetters = new ArrayList<>();
+//		StringBuilder abbr = new StringBuilder("");
+//		
+//		int j = 0;
+//		while (j < phrase.length()) {
+//			if (Character.isLetter(phrase.charAt(j))){
+//				firstLetters.add(j);
+//				while((Character.isLetter(phrase.charAt(j))) && (j < phrase.length())) {++j;}
+//			}
+//			else {
+//				++j;
+//			}
+//		}
+//		for(int j1 = 0; j1 < firstLetters.size(); j1++) {
+//			abbr.append(Character.toUpperCase((phrase.charAt(firstLetters.get(j1)))));
+//		}
+//		return abbr.toString();
+//	}
 	/**
 	 * 3. Determine if a triangle is equilateral, isosceles, or scalene. An
 	 * equilateral triangle has all three sides the same length. An isosceles
@@ -84,18 +146,30 @@ public class EvaluationService {
 		}
 
 		public boolean isEquilateral() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			if ((this.sideOne == this.sideTwo) && (this.sideOne == this.sideThree)) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 
 		public boolean isIsosceles() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			if ((this.sideOne == this.sideTwo) ^ (this.sideOne == this.sideThree) ^ (this.sideTwo == this.sideThree)) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 
 		public boolean isScalene() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			if ((this.sideOne != this.sideTwo) && (this.sideOne != this.sideThree) && (this.sideTwo != this.sideThree)) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 
 	}
@@ -107,7 +181,7 @@ public class EvaluationService {
 	 * C, M, P = 3; F, H, V, W, Y = 4; K = 5; J, X = 8; Q, Z = 10; Examples
 	 * "cabbage" should be scored as worth 14 points:
 	 * 
-	 * 3 points for C, 1 point for A, twice 3 points for B, twice 2 points for G, 1
+	 * 3 points for C, 1 point for A, twice 3 points for B, 2 points for G, 1
 	 * point for E And to total:
 	 * 
 	 * 3 + 2*1 + 2*3 + 2 + 1 = 3 + 2 + 6 + 3 = 5 + 9 = 14
@@ -116,8 +190,23 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getScrabbleScore(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		HashMap<Character,Integer> scrabbleKey = new HashMap<>();
+		StringBuilder sb = new StringBuilder(string.toUpperCase());
+		int score = 0;
+		char[] onePoint = {'A','E','I','O','U','L','N','R','S','T'};
+		for(char mychar:onePoint) {
+			scrabbleKey.put(mychar,1);
+		}
+		scrabbleKey.put('D', 2); scrabbleKey.put('G', 2); scrabbleKey.put('B', 3); scrabbleKey.put('C', 3); 
+		scrabbleKey.put('M', 3); scrabbleKey.put('P', 3); scrabbleKey.put('F', 4); scrabbleKey.put('H', 4); 
+		scrabbleKey.put('V', 4); scrabbleKey.put('W', 4); scrabbleKey.put('Y', 4); scrabbleKey.put('K', 5);
+		scrabbleKey.put('J', 8); scrabbleKey.put('X', 8); scrabbleKey.put('Q', 10); scrabbleKey.put('Z', 10); 
+		
+		
+		for (int i = 0; i < string.length(); i++) {
+			score += scrabbleKey.get(sb.charAt(i));
+		}
+		return score;
 	}
 
 	/**
@@ -143,7 +232,7 @@ public class EvaluationService {
 	 * 
 	 * For example, the inputs
 	 * 
-	 * +1 (613)-995-0253 613-995-0253 1 613 995 0253 613.995.0253 should all produce
+	 * +1 (613)-995-0253, 613-995-0253, 1 613 995 0253, 613.995.0253 should all produce
 	 * the output
 	 * 
 	 * 6139950253
@@ -152,8 +241,18 @@ public class EvaluationService {
 	 * NANP-countries, only 1 is considered a valid country code.
 	 */
 	public String cleanPhoneNumber(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		String cleanNum = string.replaceAll("(\\D)",""); // get rid of all non digits
+		if (cleanNum.length() > 11 || cleanNum.length() < 10) {
+			throw new IllegalArgumentException();
+		}
+		
+		if (cleanNum.length() == 11) {
+			if (cleanNum.charAt(0) != '1') {
+				throw new IllegalArgumentException("Not in US");
+			}
+			return cleanNum.substring(1,string.length());
+		}
+		return cleanNum;
 	}
 
 	/**
@@ -166,8 +265,18 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		Map<String,Integer> wordMap = new HashMap<>();
+		String[] words = string.split("(\\W+)"); //grabs each word
+		for (String word:words) { // for each word do this
+			int wordCount = 0; // initialize counter
+			for (int j = 0;j < words.length; j++) { // compare word with all the words
+				if (word.compareTo(words[j]) == 0) {
+					++wordCount;
+				}
+			}
+			wordMap.put(word, wordCount);
+		}
+		return wordMap;
 	}
 
 	/**
@@ -209,8 +318,20 @@ public class EvaluationService {
 		private List<T> sortedList;
 
 		public int indexOf(T t) {
-			// TODO Write an implementation for this method declaration
-			return 0;
+
+			int halfwaypoint = sortedList.size() % 2 == 0 ? sortedList.size()/2 : sortedList.size()/2 + 1;
+
+			while (sortedList.indexOf(t) != halfwaypoint){
+				if (sortedList.indexOf(t) > halfwaypoint) {
+					halfwaypoint = halfwaypoint % 2 == 0 ? halfwaypoint * 3/2 : (halfwaypoint * 3 + 1) / 2;
+				}
+				else if (sortedList.indexOf(t) < halfwaypoint) {
+					halfwaypoint = halfwaypoint % 2 == 0 ? halfwaypoint / 2 : (halfwaypoint - 1) / 2;
+				}
+			} 
+
+
+			return halfwaypoint;
 		}
 
 		public BinarySearch(List<T> sortedList) {
@@ -245,10 +366,48 @@ public class EvaluationService {
 	 * @param string
 	 * @return
 	 */
-	public String toPigLatin(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+	private static boolean isVowel(char c) {
+		char[] vowels = {'a','e','i','o','u'};
+		for (char v:vowels) {
+			if (Character.toLowerCase(c) == v) {
+				return true;
+			}
+		}
+		return false;
 	}
+	
+	public String toPigLatin(String string) {
+		String[] sentence = string.split("([\\t\\n\\x0b\\r\\f-_])");
+		StringBuilder output = new StringBuilder();
+
+		for (String word:sentence) {
+			StringBuilder sb = new StringBuilder(word);
+			for(char c:word.toCharArray()) { // move consonants to end
+
+				if (c == 'q') { // assumes qu
+					sb.append("qu");
+					sb.append("ay");
+					sb.deleteCharAt(0);
+					sb.deleteCharAt(0);
+					break;
+				}
+				if (EvaluationService.isVowel(c)){
+					sb.append("ay");
+					break;
+				}
+				else {
+					sb.append(c);
+					sb.deleteCharAt(0);
+				}
+			}
+			if (output.length() > 0) {
+				output.append(" ");
+			}
+			output.append(sb.toString());
+		}
+		return output.toString();
+	}
+
 
 	/**
 	 * 9. An Armstrong number is a number that is the sum of its own digits each
@@ -266,7 +425,17 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isArmstrongNumber(int input) {
-		// TODO Write an implementation for this method declaration
+		//char[] charinput = Character.toChars(input);
+		char[] charinput = Integer.valueOf(input).toString().toCharArray();
+		int numdigits = charinput.length;
+		int sum = 0;
+		for(int j = 0; j < numdigits; j++) {
+			int num = Integer.parseInt(charinput[j] + ""); // charinput[j] wasnt returning plain number
+			sum +=  Math.pow(num, numdigits);
+		}
+		if (sum == input) {
+			return true;
+		}
 		return false;
 	}
 
@@ -280,9 +449,24 @@ public class EvaluationService {
 	 * @param l
 	 * @return
 	 */
-	public List<Long> calculatePrimeFactorsOf(long l) {
-		// TODO Write an implementation for this method declaration
-		return null;
+	
+	public List<Long> calculatePrimeFactorsOf(long num) {
+		List<Long> primes = new ArrayList<>();
+		int j = 2;
+		while(j <= num) {
+			if (num % j == 0) { // smallest j that cleanly divides num implicitly must be prime. isPrime() not needed.
+				primes.add(Long.valueOf((long)j)); 
+				num /= j; 
+				if (num == 1) { // done factoring
+					return primes;
+				}
+				j = 2; // return j to first prime
+				// factor out prime
+				continue;
+			}
+			++j; // not cleanly divisible
+		}
+		return primes;
 	}
 
 	/**
@@ -320,8 +504,38 @@ public class EvaluationService {
 		}
 
 		public String rotate(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			Map<Character,Character> encoder = new HashMap<>();
+			List<Character> alphabet = new ArrayList<>();
+			List<Character> encodedbet = new ArrayList<>();
+			StringBuilder encodedString = new StringBuilder();
+
+			
+			char[] ab = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+			for(int j = 0;j < ab.length; j++) {
+				alphabet.add(ab[j]);
+				encodedbet.add(ab[j]);
+			}
+			Collections.rotate(encodedbet, -key); // can do mannually w/2 for loops
+			
+			for (int m = 0;m < alphabet.size();++m) {
+				encoder.put(alphabet.get(m), encodedbet.get(m));
+			} // put lists to map
+			
+			for(char ch:string.toCharArray()) {
+				if(Character.isAlphabetic(ch)) {
+					if (Character.isUpperCase(ch)) {
+						encodedString.append(Character.toUpperCase(encoder.get(Character.toLowerCase(ch))));
+					}
+					else {
+						encodedString.append(encoder.get(ch));
+					}
+				}
+				else{
+					encodedString.append(ch);
+				}
+			}
+				
+			return encodedString.toString();
 		}
 
 	}
@@ -338,9 +552,34 @@ public class EvaluationService {
 	 * @param i
 	 * @return
 	 */
+	
+	private static boolean isPrime(int num) {
+		int j = 2;
+		if (num == 1) { return false;}
+		while (j < num) {
+			if (num % j == 0) {
+				return false;
+			}
+			j++;
+		}
+		return true;
+	}
+	
 	public int calculateNthPrime(int i) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		if (i <1) {
+			throw new IllegalArgumentException();
+		}
+		int nthprime = 0;
+		int primeCounter = 0;
+		int j = 2;
+		while(primeCounter < i) {
+			if (EvaluationService.isPrime(j)) {
+				nthprime = j;
+				++primeCounter;
+			}
+			++j;
+		}
+		return nthprime;
 	}
 
 	/**
@@ -368,7 +607,8 @@ public class EvaluationService {
 	 *
 	 */
 	static class AtbashCipher {
-
+		private static char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+		private static char[] encodedbet = "zyxwvutsrqponmlkjihgfedcba".toCharArray();
 		/**
 		 * Question 13
 		 * 
@@ -376,8 +616,31 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String encode(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			StringBuilder output = new StringBuilder();
+			String fixedInput;
+			int counter = 0;
+			Map<Character,Character> encoder = new HashMap<>();
+			
+			for (int i = 0;i < alphabet.length; ++i) {
+				encoder.put(alphabet[i], encodedbet[i]);
+			}
+			
+			fixedInput = string.replaceAll("(\\W)", ""); // delete non letters/numbers
+			for (char c:fixedInput.toCharArray()) {
+				if (counter == 5) {
+					counter = 0;
+					output.append(" ");
+				}
+				if (Character.isAlphabetic(c)) {
+					output.append(encoder.get(Character.valueOf(Character.toLowerCase(c))));
+				}
+				else {
+					output.append(c);
+				}
+				++counter;
+				
+			}
+			return output.toString();
 		}
 
 		/**
@@ -387,8 +650,24 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String decode(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			Map<Character,Character> decoder = new HashMap<>();
+			StringBuilder output = new StringBuilder();
+			String fixedInput;
+			for (int i = 0;i < encodedbet.length; ++i) {
+				decoder.put(encodedbet[i], alphabet[i]);
+			}
+
+			fixedInput = string.replaceAll("(\\W)", ""); // delete spaces
+			for (char c:fixedInput.toCharArray()) {
+				if(Character.isAlphabetic((c))){
+					output.append(decoder.get(Character.valueOf(Character.toLowerCase(c))));
+				}
+				else {
+					output.append(c); // append numbers
+				}
+			}
+			
+			return output.toString();
 		}
 	}
 
@@ -415,7 +694,23 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isValidIsbn(String string) {
-		// TODO Write an implementation for this method declaration
+		char[] ia = (string.replaceAll("(\\W)", "")).toCharArray(); // plain fixed input array
+		int[] ii = new int[10];
+		StringBuilder isbn = new StringBuilder(string.replaceAll("[- ]", ""));
+		Pattern p = Pattern.compile(("[^0-9xX]"));
+		Matcher m = p.matcher(isbn);
+		if (m.find()){ // if there are non 0-9 or x, X letters, length will be > 1
+			return false;
+		}
+		for (int j = 0;j < ii.length-1;j++) {
+			ii[j] = Integer.parseInt(ia[j] + "");
+		}
+		ii[9] = ia[9] == 'X' || ia[9] == 'x' ? 10 : Integer.parseInt(ia[9] + "");
+
+		if ((ii[0] * 10 + ii[1] * 9 + ii[2] * 8 + ii[3] * 7 + ii[4] * 6 + 
+				ii[5] * 5 + ii[6] * 4 + ii[7] * 3 + ii[8] * 2 + ii[9]) % 11 == 0) {
+			return true;
+		}
 		return false;
 	}
 
@@ -433,14 +728,25 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isPangram(String string) {
-		// TODO Write an implementation for this method declaration
+		String alphabet = "abcdefghijklmnopqrstuvwxyz";
+		int numUniqueLetters = 0;
+		Pattern p;
+		Matcher m;
+		for (char ch:alphabet.toCharArray()) { // iterate through every letter in alphabet
+			p = Pattern.compile("([" + ch + Character.toUpperCase(ch) + "])");
+			m = p.matcher(string);
+			if(m.find()) { // if there's a match alphabet -> string
+				++numUniqueLetters;
+			}
+		}
+		if (numUniqueLetters == 26) { return true;}
 		return false;
 	}
 
 	/**
 	 * 17. Calculate the moment when someone has lived for 10^9 seconds.
 	 * 
-	 * A gigasecond is 109 (1,000,000,000) seconds.
+	 * A gigasecond is 10^9 (1,000,000,000) seconds.
 	 * 
 	 * @param given
 	 * @return
@@ -464,8 +770,22 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getSumOfMultiples(int i, int[] set) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		Set<Integer> multiples = new HashSet<>(); //uniqueness
+		int n = 1; // natural num to multiply
+		int sum = 0;
+		for (int j = 0;j < set.length;j++) {
+			while(set[j] * n < i) { //stopping point = i, upper limit
+				multiples.add(set[j] * n);
+				++n;
+			}
+			n = 1; // reset counter for each int in set
+		}
+		
+		for (Integer s:multiples) {
+			sum += s;
+		}
+		
+		return sum;
 	}
 
 	/**
@@ -505,7 +825,33 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isLuhnValid(String string) {
-		// TODO Write an implementation for this method declaration
+		StringBuilder sb = new StringBuilder(string.replaceAll("(\\s)", ""));
+		StringBuilder newsb = new StringBuilder();
+		int sum = 0;
+		int mult = 1;
+		int counter = 0;
+		
+		if(string.length() < 2) {return false;}
+		Pattern p = Pattern.compile("\\D");
+		Matcher m = p.matcher(sb);
+		if (m.find()) {return false;} // if there exist non digits/whitespace, it's not valid
+		for (char ch:sb.toString().toCharArray()) {
+			mult = counter % 2 == 0 ? 1:2; // every other digit is doubled
+
+			if (Integer.parseInt(ch + "")*mult > 9) {
+				newsb.append((Integer.parseInt(ch + "")*mult - 9));
+				sum += Integer.parseInt(ch + "")*mult - 9;
+			}
+			else {
+				newsb.append((Integer.parseInt(ch + "")*mult));
+				sum += Integer.parseInt(ch + "")*mult;
+			}
+			++counter;
+		}
+		
+		if (sum % 10 == 0) {
+			return true;
+		}
 		return false;
 	}
 
@@ -537,8 +883,39 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int solveWordProblem(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+
+		//Pattern p = Pattern.compile("(\\d+\\D+\\d+)");
+		Pattern p = Pattern.compile("([0-9]+[^0-9]+[0-9]+)");
+		Matcher m = p.matcher(string);
+		m.find(); 
+		StringBuilder operator = new StringBuilder(m.group().replaceAll("(\\s*\\d+\\s*)", ""));
+		
+		String[] numString = string.split("([a-zA-z ?]+)"); // get rid of groups of 1+ non digits
+		int[] num = new int[numString.length];
+		for (int stringCounter = 0;stringCounter < 2;stringCounter++) { 
+			num[stringCounter] = Integer.parseInt(numString[stringCounter+1]);
+		}
+		operator = new StringBuilder(operator.toString().replaceAll("[-]", ""));
+		if (operator.charAt(0) == ' ') {
+			operator.deleteCharAt(0);
+		}
+		if (operator.charAt(operator.length() - 1) == ' ') {
+			operator.deleteCharAt(operator.length() - 1);
+		}
+		
+		switch(operator.toString()) {
+		case "plus":
+			return num[0] + num[1];
+		case "minus":
+			return num[0] - num[1];
+		case "multiplied by":
+			return num[0] * num[1];
+		case "divided by":
+			return num[0] / num[1];
+		default:
+			System.out.println("Invalid operator");
+			return 0;
+		}
 	}
 
 }
