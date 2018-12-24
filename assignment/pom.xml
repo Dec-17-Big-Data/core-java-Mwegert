@@ -4,7 +4,7 @@
 
 	<groupId>com.revature.eval.java</groupId>
 	<artifactId>core</artifactId>
-	<version>1.0</version>
+	<version>1.8</version>
 	<packaging>jar</packaging>
 
 	<name>core</name>
