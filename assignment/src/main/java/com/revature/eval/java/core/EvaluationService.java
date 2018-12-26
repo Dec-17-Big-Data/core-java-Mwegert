@@ -109,11 +109,10 @@ public class EvaluationService {
 		private double sideOne;
 		private double sideTwo;
 		private double sideThree;
-
+		
 		public Triangle() {
 			super();
 		}
-
 		public Triangle(double sideOne, double sideTwo, double sideThree) {
 			this();
 			this.sideOne = sideOne;
@@ -271,7 +270,7 @@ public class EvaluationService {
 			int wordCount = 0; // initialize counter
 			for (int j = 0;j < words.length; j++) { // compare word with all the words
 				if (word.compareTo(words[j]) == 0) {
-					++wordCount;
+					++wordCount; 
 				}
 			}
 			wordMap.put(word, wordCount);
@@ -314,22 +313,21 @@ public class EvaluationService {
 	 * binary search is a dichotomic divide and conquer search algorithm.
 	 * 
 	 */
-	static class BinarySearch<T> {
+	static class BinarySearch<T extends Comparable<T>> {
 		private List<T> sortedList;
 
 		public int indexOf(T t) {
-
+			
 			int halfwaypoint = sortedList.size() % 2 == 0 ? sortedList.size()/2 : sortedList.size()/2 + 1;
-
-			while (sortedList.indexOf(t) != halfwaypoint){
-				if (sortedList.indexOf(t) > halfwaypoint) {
+			while (t.compareTo(sortedList.get(halfwaypoint)) != 0){
+				System.out.println(sortedList.get(halfwaypoint));
+				if (t.compareTo(sortedList.get(halfwaypoint)) > 0) {
 					halfwaypoint = halfwaypoint % 2 == 0 ? halfwaypoint * 3/2 : (halfwaypoint * 3 + 1) / 2;
 				}
-				else if (sortedList.indexOf(t) < halfwaypoint) {
+				else if (t.compareTo(sortedList.get(halfwaypoint)) < 0) {
 					halfwaypoint = halfwaypoint % 2 == 0 ? halfwaypoint / 2 : (halfwaypoint - 1) / 2;
 				}
 			} 
-
 
 			return halfwaypoint;
 		}
